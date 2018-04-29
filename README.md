@@ -85,18 +85,18 @@ A side effect of this change is that libconsensus no longer depends on OpenSSL.
 
 A major part of the outbound traffic is caused by serving historic blocks to other nodes in initial block download state.
 
-It is now possible to reduce the total upload traffic via the -maxuploadtarget parameter. This is not a hard limit but a threshold to minimize the outbound traffic. When the limit is about to be reached, the uploaded data is cut by not serving historic blocks (blocks older than one week). Moreover, any SPV peer is disconnected when they request a filtered block.
+It is now possible to reduce the total upload traffic via the ```-maxuploadtarget``` parameter. This is not a hard limit but a threshold to minimize the outbound traffic. When the limit is about to be reached, the uploaded data is cut by not serving historic blocks (blocks older than one week). Moreover, any SPV peer is disconnected when they request a filtered block.
 
-This option can be specified in MiB per day and is turned off by default (-maxuploadtarget=0). The recommended minimum is 144 * MAX_BLOCK_SIZE (currently 144MB) per day.
+This option can be specified in MiB per day and is turned off by default (```-maxuploadtarget=0```). The recommended minimum is 144 * MAX_BLOCK_SIZE (currently 144MB) per day.
 
 Whitelisted peers will never be disconnected, although their traffic counts for calculating the target.
 
-A more detailed documentation about keeping traffic low can be found in /doc/reduce-traffic.md.
+A more detailed documentation about keeping traffic low can be found in [reduce-traffic](https://github.com/bitcoin/bitcoin/blob/v0.12.0/doc/reduce-traffic.md)
 
 
 ##Direct headers announcement (BIP 130)
 
-Between compatible peers, [BIP 130] (https://github.com/bitcoin/bips/blob/master/bip-0130.mediawiki) direct headers announcement is used. This means that blocks are advertised by announcing their headers directly, instead of just announcing the hash. In a reorganization, all new headers are sent, instead of just the new tip. This can often prevent an extra roundtrip before the actual block is downloaded.
+Between compatible peers, [BIP 130](https://github.com/bitcoin/bips/blob/master/bip-0130.mediawiki) direct headers announcement is used. This means that blocks are advertised by announcing their headers directly, instead of just announcing the hash. In a reorganization, all new headers are sent, instead of just the new tip. This can often prevent an extra roundtrip before the actual block is downloaded.
 
 With this change, pruning nodes are now able to relay new blocks to compatible peers.
 
@@ -105,25 +105,25 @@ With this change, pruning nodes are now able to relay new blocks to compatible p
 
 Previous versions of Bitcoin Core had their mempool limited by checking a transaction’s fees against the node’s minimum relay fee. There was no upper bound on the size of the mempool and attackers could send a large number of transactions paying just slighly more than the default minimum relay fee to crash nodes with relatively low RAM. A temporary workaround for previous versions of Bitcoin Core was to raise the default minimum relay fee.
 
-Bitcoin Core 0.12 will have a strict maximum size on the mempool. The default value is 300 MB and can be configured with the -maxmempool parameter. Whenever a transaction would cause the mempool to exceed its maximum size, the transaction that (along with in-mempool descendants) has the lowest total feerate (as a package) will be evicted and the node’s effective minimum relay feerate will be increased to match this feerate plus the initial minimum relay feerate. The initial minimum relay feerate is set to 1000 satoshis per kB.
+Bitcoin Core 0.12 will have a strict maximum size on the mempool. The default value is 300 MB and can be configured with the ```-maxmempool``` parameter. Whenever a transaction would cause the mempool to exceed its maximum size, the transaction that (along with in-mempool descendants) has the lowest total feerate (as a package) will be evicted and the node’s effective minimum relay feerate will be increased to match this feerate plus the initial minimum relay feerate. The initial minimum relay feerate is set to 1000 satoshis per kB.
 
-Bitcoin Core 0.12 also introduces new default policy limits on the length and size of unconfirmed transaction chains that are allowed in the mempool (generally limiting the length of unconfirmed chains to 25 transactions, with a total size of 101 KB). These limits can be overriden using command line arguments; see the extended help (--help -help-debug) for more information.
+Bitcoin Core 0.12 also introduces new default policy limits on the length and size of unconfirmed transaction chains that are allowed in the mempool (generally limiting the length of unconfirmed chains to 25 transactions, with a total size of 101 KB). These limits can be overriden using command line arguments; see the extended help (```--help -help-debug```) for more information.
 
 
 ##Opt-in Replace-by-fee transactions
 
-It is now possible to replace transactions in the transaction memory pool of Bitcoin Core 0.12 nodes. Bitcoin Core will only allow replacement of transactions which have any of their inputs’ nSequence number set to less than 0xffffffff - 1. Moreover, a replacement transaction may only be accepted when it pays sufficient fee, as described in [BIP 125] (https://github.com/bitcoin/bips/blob/master/bip-0125.mediawiki).
+It is now possible to replace transactions in the transaction memory pool of Bitcoin Core 0.12 nodes. Bitcoin Core will only allow replacement of transactions which have any of their inputs’ ```nSequence``` number set to less than ```0xffffffff - 1```. Moreover, a replacement transaction may only be accepted when it pays sufficient fee, as described in [BIP 125](https://github.com/bitcoin/bips/blob/master/bip-0125.mediawiki).
 
-Transaction replacement can be disabled with a new command line option, -mempoolreplacement=0. Transactions signaling replacement under BIP125 will still be allowed into the mempool in this configuration, but replacements will be rejected. This option is intended for miners who want to continue the transaction selection behavior of previous releases.
+Transaction replacement can be disabled with a new command line option, ```-mempoolreplacement=0```. Transactions signaling replacement under BIP125 will still be allowed into the mempool in this configuration, but replacements will be rejected. This option is intended for miners who want to continue the transaction selection behavior of previous releases.
 
-The -mempoolreplacement option is not recommended for wallet users seeking to avoid receipt of unconfirmed opt-in transactions, because this option does not prevent transactions which are replaceable under BIP 125 from being accepted (only subsequent replacements, which other nodes on the network that implement BIP 125 are likely to relay and mine). Wallet users wishing to detect whether a transaction is subject to replacement under BIP 125 should instead use the updated RPC calls gettransaction and listtransactions, which now have an additional field in the output indicating if a transaction is replaceable under BIP125 (“bip125-replaceable”).
+The ```-mempoolreplacement``` option is not recommended for wallet users seeking to avoid receipt of unconfirmed opt-in transactions, because this option does not prevent transactions which are replaceable under BIP 125 from being accepted (only subsequent replacements, which other nodes on the network that implement BIP 125 are likely to relay and mine). Wallet users wishing to detect whether a transaction is subject to replacement under BIP 125 should instead use the updated RPC calls ```gettransaction``` and ```listtransactions```, which now have an additional field in the output indicating if a transaction is replaceable under BIP125 (“bip125-replaceable”).
 
 Note that the wallet in Bitcoin Core 0.12 does not yet have support for creating transactions that would be replaceable under BIP 125.
 
 
 ##RPC: Random-cookie RPC authentication
 
-When no -rpcpassword is specified, the daemon now uses a special ‘cookie’ file for authentication. This file is generated with random content when the daemon starts, and deleted when it exits. Its contents are used as authentication token. Read access to this file controls who can access through RPC. By default it is stored in the data directory but its location can be overridden with the option -rpccookiefile.
+When no ```-rpcpassword``` is specified, the daemon now uses a special ‘cookie’ file for authentication. This file is generated with random content when the daemon starts, and deleted when it exits. Its contents are used as authentication token. Read access to this file controls who can access through RPC. By default it is stored in the data directory but its location can be overridden with the option ```-rpccookiefile```.
 
 This is similar to Tor’s CookieAuthentication: see https://www.torproject.org/docs/tor-manual.html.en
 
@@ -137,15 +137,15 @@ Previously OP_RETURN outputs with a payload were only relayed and mined if they 
 
 ##Relay and Mining: Priority transactions
 
-Bitcoin Core has a heuristic ‘priority’ based on coin value and age. This calculation is used for relaying of transactions which do not pay the minimum relay fee, and can be used as an alternative way of sorting transactions for mined blocks. Bitcoin Core will relay transactions with insufficient fees depending on the setting of -limitfreerelay=<r> (default: r=15 kB per minute) and -blockprioritysize=<s>.
+Bitcoin Core has a heuristic ‘priority’ based on coin value and age. This calculation is used for relaying of transactions which do not pay the minimum relay fee, and can be used as an alternative way of sorting transactions for mined blocks. Bitcoin Core will relay transactions with insufficient fees depending on the setting of ```-limitfreerelay=<r>``` (default: ```r=15``` kB per minute) and ```-blockprioritysize=<s>```.
 
 In Bitcoin Core 0.12, when mempool limit has been reached a higher minimum relay fee takes effect to limit memory usage. Transactions which do not meet this higher effective minimum relay fee will not be relayed or mined even if they rank highly according to the priority heuristic.
 
-The mining of transactions based on their priority is also now disabled by default. To re-enable it, simply set -blockprioritysize=<n> where is the size in bytes of your blocks to reserve for these transactions. The old default was 50k, so to retain approximately the same policy, you would set -blockprioritysize=50000.
+The mining of transactions based on their priority is also now disabled by default. To re-enable it, simply set ```-blockprioritysize=<n>``` where is the size in bytes of your blocks to reserve for these transactions. The old default was 50k, so to retain approximately the same policy, you would set ```-blockprioritysize=50000```.
 
 Additionally, as a result of computational simplifications, the priority value used for transactions received with unconfirmed inputs is lower than in prior versions due to avoiding recomputing the amounts as input transactions confirm.
 
-External miner policy set via the prioritisetransaction RPC to rank transactions already in the mempool continues to work as it has previously. Note, however, that if mining priority transactions is left disabled, the priority delta will be ignored and only the fee metric will be effective.
+External miner policy set via the ```prioritisetransaction``` RPC to rank transactions already in the mempool continues to work as it has previously. Note, however, that if mining priority transactions is left disabled, the priority delta will be ignored and only the fee metric will be effective.
 
 This internal automatic prioritization handling is being considered for removal entirely in Bitcoin Core 0.13, and it is at this time undecided whether the more accurate priority calculation for chained unconfirmed transactions will be restored. Community direction on this topic is particularly requested to help set project priorities.
 
@@ -156,30 +156,30 @@ Starting with Tor version 0.2.7.1 it is possible, through Tor’s control socket
 
 This means that if Tor is running (and proper authorization is available), Bitcoin Core automatically creates a hidden service to listen on, without manual configuration. Bitcoin Core will also use Tor automatically to connect to other .onion nodes if the control socket can be successfully opened. This will positively affect the number of available .onion nodes and their usage.
 
-This new feature is enabled by default if Bitcoin Core is listening, and a connection to Tor can be made. It can be configured with the -listenonion, -torcontrol and -torpassword settings. To show verbose debugging information, pass -debug=tor.
+This new feature is enabled by default if Bitcoin Core is listening, and a connection to Tor can be made. It can be configured with the ```-listenonion```, ```-torcontrol``` and ```-torpassword``` settings. To show verbose debugging information, pass ```-debug=tor```.
 
 
 ##Notifications through ZMQ
 
-Bitcoind can now (optionally) asynchronously notify clients through a ZMQ-based PUB socket of the arrival of new transactions and blocks. This feature requires installation of the ZMQ C API library 4.x and configuring its use through the command line or configuration file. Please see docs/zmq.md for details of operation.
+Bitcoind can now (optionally) asynchronously notify clients through a ZMQ-based PUB socket of the arrival of new transactions and blocks. This feature requires installation of the ZMQ C API library 4.x and configuring its use through the command line or configuration file. Please see [ZeroMQ](https://github.com/bitcoin/bitcoin/blob/v0.12.0/doc/zmq.md) for details of operation.
 
 ##Wallet: Transaction fees
 
 Various improvements have been made to how the wallet calculates transaction fees.
 
-Users can decide to pay a predefined fee rate by setting -paytxfee=<n> (or settxfee <n> rpc during runtime). A value of n=0 signals Bitcoin Core to use floating fees. By default, Bitcoin Core will use floating fees.
+Users can decide to pay a predefined fee rate by setting ```-paytxfee=<n>``` (or ```settxfee <n>``` rpc during runtime). A value of ```n=0``` signals Bitcoin Core to use floating fees. By default, Bitcoin Core will use floating fees.
 
-Based on past transaction data, floating fees approximate the fees required to get into the mth block from now. This is configurable with -txconfirmtarget=<m> (default: 2).
+Based on past transaction data, floating fees approximate the fees required to get into the mth block from now. This is configurable with ```-txconfirmtarget=<m>``` (default: 2).
 
-Sometimes, it is not possible to give good estimates, or an estimate at all. Therefore, a fallback value can be set with -fallbackfee=<f> (default: 0.0002 BTC/kB).
+Sometimes, it is not possible to give good estimates, or an estimate at all. Therefore, a fallback value can be set with ```-fallbackfee=<f>``` (default: ```0.0002``` BTC/kB).
 
-At all times, Bitcoin Core will cap fees at -maxtxfee=<x> (default: 0.10) BTC. Furthermore, Bitcoin Core will never create transactions paying less than the current minimum relay fee. Finally, a user can set the minimum fee rate for all transactions with -mintxfee=<i>, which defaults to 1000 satoshis per kB.
+At all times, Bitcoin Core will cap fees at ```-maxtxfee=<x>``` (default: 0.10) BTC. Furthermore, Bitcoin Core will never create transactions paying less than the current minimum relay fee. Finally, a user can set the minimum fee rate for all transactions with ```-mintxfee=<i>```, which defaults to 1000 satoshis per kB.
 
 ##Wallet: Negative confirmations and conflict detection
 
-The wallet will now report a negative number for confirmations that indicates how deep in the block chain the conflict is found. For example, if a transaction A has 5 confirmations and spends the same input as a wallet transaction B, B will be reported as having -5 confirmations. If another wallet transaction C spends an output from B, it will also be reported as having -5 confirmations. To detect conflicts with historical transactions in the chain a one-time -rescan may be needed.
+The wallet will now report a negative number for confirmations that indicates how deep in the block chain the conflict is found. For example, if a transaction A has 5 confirmations and spends the same input as a wallet transaction B, B will be reported as having -5 confirmations. If another wallet transaction C spends an output from B, it will also be reported as having -5 confirmations. To detect conflicts with historical transactions in the chain a one-time ```-rescan``` may be needed.
 
-Unlike earlier versions, unconfirmed but non-conflicting transactions will never get a negative confirmation count. They are not treated as spendable unless they’re coming from ourself (change) and accepted into our local mempool, however. The new “trusted” field in the listtransactions RPC output indicates whether outputs of an unconfirmed transaction are considered spendable.
+Unlike earlier versions, unconfirmed but non-conflicting transactions will never get a negative confirmation count. They are not treated as spendable unless they’re coming from ourself (change) and accepted into our local mempool, however. The new “trusted” field in the ```listtransactions``` RPC output indicates whether outputs of an unconfirmed transaction are considered spendable.
 
 ##Wallet: Merkle branches removed
 
@@ -189,17 +189,17 @@ Previously, every wallet transaction stored a Merkle branch to prove its presenc
 
 With 0.12 it is possible to use wallet functionality in pruned mode. This can reduce the disk usage from currently around 60 GB to around 2 GB.
 
-However, rescans as well as the RPCs importwallet, importaddress, importprivkey are disabled.
+However, rescans as well as the RPCs ```importwallet```, ```importaddress```, ```importprivkey``` are disabled.
 
-To enable block pruning set prune=<N> on the command line or in bitcoin.conf, where N is the number of MiB to allot for raw block & undo data.
+To enable block pruning set ```prune=<N>``` on the command line or in ```bitcoin.conf```, where N is the number of MiB to allot for raw block & undo data.
 
 A value of 0 disables pruning. The minimal value above 0 is 550. Your wallet is as secure with high values as it is with low ones. Higher values merely ensure that your node will not shut down upon blockchain reorganizations of more than 2 days - which are unlikely to happen in practice. In future releases, a higher value may also help the network as a whole: stored blocks could be served to other nodes.
 
-For further information about pruning, you may also consult the release notes of v0.11.0.
+For further information about pruning, you may also consult the release notes of [v0.11.0](https://github.com/bitcoin/bitcoin/blob/v0.11.0/doc/release-notes.md#block-file-pruning).
 
 ##```NODE_BLOOM``` service bit
 
-Support for the ```NODE_BLOOM``` service bit, as described in BIP 111, has been added to the P2P protocol code.
+Support for the ```NODE_BLOOM``` service bit, as described in [BIP 111](https://github.com/bitcoin/bips/blob/master/bip-0111.mediawiki), has been added to the P2P protocol code.
 
 BIP 111 defines a service bit to allow peers to advertise that they support bloom filters (such as used by SPV clients) explicitly. It also bumps the protocol version to allow peers to identify old nodes which allow bloom filtering of the connection despite lacking the new service bit.
 
@@ -528,67 +528,3 @@ The former implementation of the bytespersigop filter accidentally broke bare mu
 
 * Each ZMQ notification now contains an up-counting sequence number that allows listeners to detect lost notifications. The sequence number is always the last element in a multi-part ZMQ notification and therefore backward compatible. Each message type has its own counter. PR #7762.
 
-
-######Version 00.13.1
-
-Segregated witness soft fork
-
-Segregated witness (segwit) is a soft fork that, if activated, will allow transaction-producing software to separate (segregate) transaction signatures (witnesses) from the part of the data in a transaction that is covered by the txid. This provides several immediate benefits:
-
-    Elimination of unwanted transaction malleability: Segregating the witness allows both existing and upgraded software to calculate the transaction identifier (txid) of transactions without referencing the witness, which can sometimes be changed by third-parties (such as miners) or by co-signers in a multisig spend. This solves all known cases of unwanted transaction malleability, which is a problem that makes programming Bitcoin wallet software more difficult and which seriously complicates the design of smart contracts for Bitcoin.
-
-    Capacity increase: Segwit transactions contain new fields that are not part of the data currently used to calculate the size of a block, which allows a block containing segwit transactions to hold more data than allowed by the current maximum block size. Estimates based on the transactions currently found in blocks indicate that if all wallets switch to using segwit, the network will be able to support about 70% more transactions. The network will also be able to support more of the advanced-style payments (such as multisig) than it can support now because of the different weighting given to different parts of a transaction after segwit activates (see the following section for details).
-
-    Weighting data based on how it affects node performance: Some parts of each Bitcoin block need to be stored by nodes in order to validate future blocks; other parts of a block can be immediately forgotten (pruned) or used only for helping other nodes sync their copy of the block chain. One large part of the immediately prunable data are transaction signatures (witnesses), and segwit makes it possible to give a different “weight” to segregated witnesses to correspond with the lower demands they place on node resources. Specifically, each byte of a segregated witness is given a weight of 1, each other byte in a block is given a weight of 4, and the maximum allowed weight of a block is 4 million. Weighting the data this way better aligns the most profitable strategy for creating blocks with the long-term costs of block validation.
-
-    Signature covers value: A simple improvement in the way signatures are generated in segwit simplifies the design of secure signature generators (such as hardware wallets), reduces the amount of data the signature generator needs to download, and allows the signature generator to operate more quickly. This is made possible by having the generator sign the amount of bitcoins they think they are spending, and by having full nodes refuse to accept those signatures unless the amount of bitcoins being spent is exactly the same as was signed. For non-segwit transactions, wallets instead had to download the complete previous transactions being spent for every payment they made, which could be a slow operation on hardware wallets and in other situations where bandwidth or computation speed was constrained.
-
-    Linear scaling of sighash operations: In 2015 a block was produced that required about 25 seconds to validate on modern hardware because of the way transaction signature hashes are performed. Other similar blocks, or blocks that could take even longer to validate, can still be produced today. The problem that caused this can’t be fixed in a soft fork without unwanted side-effects, but transactions that opt-in to using segwit will now use a different signature method that doesn’t suffer from this problem and doesn’t have any unwanted side-effects.
-
-    Increased security for multisig: Bitcoin addresses (both P2PKH addresses that start with a ‘1’ and P2SH addresses that start with a ‘3’) use a hash function known as RIPEMD-160. For P2PKH addresses, this provides about 160 bits of security—which is beyond what cryptographers believe can be broken today. But because P2SH is more flexible, only about 80 bits of security is provided per address. Although 80 bits is very strong security, it is within the realm of possibility that it can be broken by a powerful adversary. Segwit allows advanced transactions to use the SHA256 hash function instead, which provides about 128 bits of security (that is 281 trillion times as much security as 80 bits and is equivalent to the maximum bits of security believed to be provided by Bitcoin’s choice of parameters for its Elliptic Curve Digital Security Algorithm [ECDSA].)
-
-    More efficient almost-full-node security Satoshi Nakamoto’s original Bitcoin paper describes a method for allowing newly-started full nodes to skip downloading and validating some data from historic blocks that are protected by large amounts of proof of work. Unfortunately, Nakamoto’s method can’t guarantee that a newly-started node using this method will produce an accurate copy of Bitcoin’s current ledger (called the UTXO set), making the node vulnerable to falling out of consensus with other nodes. Although the problems with Nakamoto’s method can’t be fixed in a soft fork, Segwit accomplishes something similar to his original proposal: it makes it possible for a node to optionally skip downloading some blockchain data (specifically, the segregated witnesses) while still ensuring that the node can build an accurate copy of the UTXO set for the block chain with the most proof of work. Segwit enables this capability at the consensus layer, but note that Bitcoin Core does not provide an option to use this capability as of this 0.13.1 release.
-
-    Script versioning: Segwit makes it easy for future soft forks to allow Bitcoin users to individually opt-in to almost any change in the Bitcoin Script language when those users receive new transactions. Features currently being researched by Bitcoin Core contributors that may use this capability include support for Schnorr signatures, which can improve the privacy and efficiency of multisig transactions (or transactions with multiple inputs), and Merklized Abstract Syntax Trees (MAST), which can improve the privacy and efficiency of scripts with two or more conditions. Other Bitcoin community members are studying several other improvements that can be made using script versioning.
-
-Activation for the segwit soft fork is being managed using BIP9 versionbits. Segwit’s version bit is bit 1, and nodes will begin tracking which blocks signal support for segwit at the beginning of the first retarget period after segwit’s start date of 15 November 2016. If 95% of blocks within a 2,016-block retarget period (about two weeks) signal support for segwit, the soft fork will be locked in. After another 2,016 blocks, segwit will activate.
-
-For more information about segwit, please see the segwit FAQ, the segwit wallet developers guide or BIPs 141, 143, 144, and 145. If you’re a miner or mining pool operator, please see the versionbits FAQ for information about signaling support for a soft fork.
-Null dummy soft fork
-
-Combined with the segwit soft fork is an additional change that turns a long-existing network relay policy into a consensus rule. The OP_CHECKMULTISIG and OP_CHECKMULTISIGVERIFY opcodes consume an extra stack element (“dummy element”) after signature validation. The dummy element is not inspected in any manner, and could be replaced by any value without invalidating the script.
-
-Because any value can be used for this dummy element, it’s possible for a third-party to insert data into other people’s transactions, changing the transaction’s txid (called transaction malleability) and possibly causing other problems.
-
-Since Bitcoin Core 0.10.0, nodes have defaulted to only relaying and mining transactions whose dummy element was a null value (0x00, also called OP_0). The null dummy soft fork turns this relay rule into a consensus rule both for non-segwit transactions and segwit transactions, so that this method of mutating transactions is permanently eliminated from the network.
-
-Signaling for the null dummy soft fork is done by signaling support for segwit, and the null dummy soft fork will activate at the same time as segwit.
-
-For more information, please see BIP147.
-Low-level RPC changes
-
-    importprunedfunds only accepts two required arguments. Some versions accept an optional third arg, which was always ignored. Make sure to never pass more than two arguments.
-
-Linux ARM builds
-
-With the 0.13.0 release, pre-built Linux ARM binaries were added to the set of uploaded executables. Additional detail on the ARM architecture targeted by each is provided below.
-
-The following extra files can be found in the download directory or torrent:
-
-    bitcoin-${VERSION}-arm-linux-gnueabihf.tar.gz: Linux binaries targeting the 32-bit ARMv7-A architecture.
-    bitcoin-${VERSION}-aarch64-linux-gnu.tar.gz: Linux binaries targeting the 64-bit ARMv8-A architecture.
-
-ARM builds are still experimental. If you have problems on a certain device or Linux distribution combination please report them on the bug tracker, it may be possible to resolve them. Note that the device you use must be (backward) compatible with the architecture targeted by the binary that you use. For example, a Raspberry Pi 2 Model B or Raspberry Pi 3 Model B (in its 32-bit execution state) device, can run the 32-bit ARMv7-A targeted binary. However, no model of Raspberry Pi 1 device can run either binary because they are all ARMv6 architecture devices that are not compatible with ARMv7-A or ARMv8-A.
-
-Note that Android is not considered ARM Linux in this context. The executables are not expected to work out of the box on Android.
-
-
-#####Version 0.13.2
-
-Change to wallet handling of mempool rejection
-
-When a newly created transaction failed to enter the mempool due to the limits on chains of unconfirmed transactions the sending RPC calls would return an error. The transaction would still be queued in the wallet and, once some of the parent transactions were confirmed, broadcast after the software was restarted.
-
-This behavior has been changed to return success and to reattempt mempool insertion at the same time transaction rebroadcast is attempted, avoiding a need for a restart.
-
-Transactions in the wallet which cannot be accepted into the mempool can be abandoned with the previously existing abandontransaction RPC (or in the GUI via a context menu on the transaction).
