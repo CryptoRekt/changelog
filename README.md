@@ -1,10 +1,10 @@
-#codebase Change Log
+# codebase Change Log
 
 
-#####Version .11.1
+##### Version .11.1
 
 
-##Fix buffer overflow in bundled upnp
+## Fix buffer overflow in bundled upnp
 
 Bundled miniupnpc was updated to 1.9.20151008. This fixes a buffer overflow in the XML parser during initial network discovery.
 
@@ -17,7 +17,7 @@ Additionally, upnp has been disabled by default. This may result in a lower numb
 
 
 
-##Test for LowS signatures before relaying
+## Test for LowS signatures before relaying
 
 Make the node require the canonical ‘low-s’ encoding for ECDSA signatures when relaying or mining. This removes a nuisance malleability vector.
 
@@ -33,7 +33,7 @@ This does not replace the need for BIP62 or similar, as miners can still coopera
 
 [1] On the Malleability of Bitcoin Transactions Marcin Andrychowicz, Stefan Dziembowski, Daniel Malinowski, Łukasz Mazurek http://fc15.ifca.ai/preproceedings/bitcoin/paper_9.pdf
 
-##Minimum relay fee default increase
+## Minimum relay fee default increase
 
 The default for the ```-minrelaytxfee``` setting has been increased from ```0.00001``` to ```0.00005```.
 
@@ -42,12 +42,12 @@ This is necessitated by the current transaction flooding, causing outrageous mem
 
 
 
-######Version .11.2
+###### Version .11.2
 
 
 
 
-##BIP113 mempool-only locktime enforcement using GetMedianTimePast()
+## BIP113 mempool-only locktime enforcement using GetMedianTimePast()
 
 Bitcoin transactions currently may specify a locktime indicating when they may be added to a valid block. Current consensus rules require that blocks have a block header time greater than the locktime specified in any transaction in that block.
 
@@ -66,7 +66,7 @@ Implication for users: GetMedianTimePast() always trails behind the current time
 
 
 
-##Windows bug fix for corrupted UTXO database on unclean shutdowns
+## Windows bug fix for corrupted UTXO database on unclean shutdowns
 
 Several Windows users reported that they often need to reindex the entire blockchain after an unclean shutdown of Bitcoin Core on Windows (or an unclean shutdown of Windows itself). Although unclean shutdowns remain unsafe, this release no longer relies on memory-mapped files for the UTXO database, which significantly reduced the frequency of unclean shutdowns leading to required reindexes during testing.
 
@@ -75,12 +75,12 @@ Other fixes for database corruption on Windows are expected in the next major re
 
 
 
-######Version 0.12.0
+###### Version 0.12.0
 
 
 
 
-##Signature validation using libsecp256k1
+## Signature validation using libsecp256k1
 
 ECDSA signatures inside Bitcoin transactions now use validation using libsecp256k1 instead of OpenSSL.
 
@@ -93,7 +93,7 @@ A side effect of this change is that libconsensus no longer depends on OpenSSL.
 
 
 
-##Reduce upload traffic
+## Reduce upload traffic
 
 A major part of the outbound traffic is caused by serving historic blocks to other nodes in initial block download state.
 
@@ -108,7 +108,7 @@ A more detailed documentation about keeping traffic low can be found in [reduce-
 
 
 
-##Direct headers announcement (BIP 130)
+## Direct headers announcement (BIP 130)
 
 Between compatible peers, [BIP 130](https://github.com/bitcoin/bips/blob/master/bip-0130.mediawiki) direct headers announcement is used. This means that blocks are advertised by announcing their headers directly, instead of just announcing the hash. In a reorganization, all new headers are sent, instead of just the new tip. This can often prevent an extra roundtrip before the actual block is downloaded.
 
@@ -117,7 +117,7 @@ With this change, pruning nodes are now able to relay new blocks to compatible p
 
 
 
-##Memory pool limiting
+## Memory pool limiting
 
 Previous versions of Bitcoin Core had their mempool limited by checking a transaction’s fees against the node’s minimum relay fee. There was no upper bound on the size of the mempool and attackers could send a large number of transactions paying just slighly more than the default minimum relay fee to crash nodes with relatively low RAM. A temporary workaround for previous versions of Bitcoin Core was to raise the default minimum relay fee.
 
@@ -128,7 +128,7 @@ Bitcoin Core 0.12 also introduces new default policy limits on the length and si
 
 
 
-##Opt-in Replace-by-fee transactions
+## Opt-in Replace-by-fee transactions
 
 It is now possible to replace transactions in the transaction memory pool of Bitcoin Core 0.12 nodes. Bitcoin Core will only allow replacement of transactions which have any of their inputs’ ```nSequence``` number set to less than ```0xffffffff - 1```. Moreover, a replacement transaction may only be accepted when it pays sufficient fee, as described in [BIP 125](https://github.com/bitcoin/bips/blob/master/bip-0125.mediawiki).
 
@@ -141,7 +141,7 @@ Note that the wallet in Bitcoin Core 0.12 does not yet have support for creating
 
 
 
-##RPC: Random-cookie RPC authentication
+## RPC: Random-cookie RPC authentication
 
 When no ```-rpcpassword``` is specified, the daemon now uses a special ‘cookie’ file for authentication. This file is generated with random content when the daemon starts, and deleted when it exits. Its contents are used as authentication token. Read access to this file controls who can access through RPC. By default it is stored in the data directory but its location can be overridden with the option ```-rpccookiefile```.
 
@@ -151,15 +151,15 @@ This allows running bitcoind without having to do any manual configuration.
 
 
 
-
-##Relay: Any sequence of pushdatas in OP_RETURN outputs now allowed
+ 
+## Relay: Any sequence of pushdatas in OP_RETURN outputs now allowed
 
 Previously OP_RETURN outputs with a payload were only relayed and mined if they had a single pushdata. This restriction has been lifted to allow any combination of data pushes and numeric constant opcodes (OP_1 to OP_16) after the OP_RETURN. The limit on OP_RETURN output size is now applied to the entire serialized scriptPubKey, 83 bytes by default. (the previous 80 byte default plus three bytes overhead)
 
 
 
 
-##Relay and Mining: Priority transactions
+## Relay and Mining: Priority transactions
 
 Bitcoin Core has a heuristic ‘priority’ based on coin value and age. This calculation is used for relaying of transactions which do not pay the minimum relay fee, and can be used as an alternative way of sorting transactions for mined blocks. Bitcoin Core will relay transactions with insufficient fees depending on the setting of ```-limitfreerelay=<r>``` (default: ```r=15``` kB per minute) and ```-blockprioritysize=<s>```.
 
@@ -176,7 +176,7 @@ This internal automatic prioritization handling is being considered for removal 
 
 
 
-##Automatically use Tor hidden services
+## Automatically use Tor hidden services
 
 Starting with Tor version 0.2.7.1 it is possible, through Tor’s control socket API, to create and destroy ‘ephemeral’ hidden services programmatically. Bitcoin Core has been updated to make use of this.
 
@@ -187,7 +187,7 @@ This new feature is enabled by default if Bitcoin Core is listening, and a conne
 
 
 
-##Notifications through ZMQ
+## Notifications through ZMQ
 
 Bitcoind can now (optionally) asynchronously notify clients through a ZMQ-based PUB socket of the arrival of new transactions and blocks. This feature requires installation of the ZMQ C API library 4.x and configuring its use through the command line or configuration file. Please see [ZeroMQ](https://github.com/bitcoin/bitcoin/blob/v0.12.0/doc/zmq.md) for details of operation.
 
@@ -195,7 +195,7 @@ Bitcoind can now (optionally) asynchronously notify clients through a ZMQ-based 
 
 
 
-##Wallet: Transaction fees
+## Wallet: Transaction fees
 
 Various improvements have been made to how the wallet calculates transaction fees.
 
@@ -211,7 +211,7 @@ At all times, Bitcoin Core will cap fees at ```-maxtxfee=<x>``` (default: 0.10) 
 
 
 
-##Wallet: Negative confirmations and conflict detection
+## Wallet: Negative confirmations and conflict detection
 
 The wallet will now report a negative number for confirmations that indicates how deep in the block chain the conflict is found. For example, if a transaction A has 5 confirmations and spends the same input as a wallet transaction B, B will be reported as having -5 confirmations. If another wallet transaction C spends an output from B, it will also be reported as having -5 confirmations. To detect conflicts with historical transactions in the chain a one-time ```-rescan``` may be needed.
 
@@ -221,7 +221,7 @@ Unlike earlier versions, unconfirmed but non-conflicting transactions will never
 
 
 
-##Wallet: Merkle branches removed
+## Wallet: Merkle branches removed
 
 Previously, every wallet transaction stored a Merkle branch to prove its presence in blocks. This wasn’t being used for more than an expensive sanity check. Since 0.12, these are no longer stored. When loading a 0.12 wallet into an older version, it will automatically rescan to avoid failed checks.
 
@@ -229,7 +229,7 @@ Previously, every wallet transaction stored a Merkle branch to prove its presenc
 
 
 
-##Wallet: Pruning
+## Wallet: Pruning
 
 With 0.12 it is possible to use wallet functionality in pruned mode. This can reduce the disk usage from currently around 60 GB to around 2 GB.
 
@@ -245,7 +245,7 @@ For further information about pruning, you may also consult the release notes of
 
 
 
-##```NODE_BLOOM``` service bit
+## ```NODE_BLOOM``` service bit
 
 Support for the ```NODE_BLOOM``` service bit, as described in [BIP 111](https://github.com/bitcoin/bips/blob/master/bip-0111.mediawiki), has been added to the P2P protocol code.
 
@@ -257,7 +257,7 @@ In this version, it is only enforced for peers that send protocol versions ```>=
 
 
 
-##Option parsing behavior
+## Option parsing behavior
 
 Command line options are now parsed strictly in the order in which they are specified. It used to be the case that ```-X -noX``` ends up, unintuitively, with X set, as ```-X``` had precedence over ```-noX```. This is no longer the case. Like for other software, the last specified value for an option will hold.
 
@@ -265,7 +265,7 @@ Command line options are now parsed strictly in the order in which they are spec
 
 
 
-##RPC: Low-level API changes
+## RPC: Low-level API changes
 
 * Monetary amounts can be provided as strings. This means that for example the argument to sendtoaddress can be “0.0001” instead of 0.0001. This can be an advantage if a JSON library insists on using a lossy floating point type for numbers, which would be dangerous for monetary amounts.
 
@@ -295,7 +295,7 @@ Note that the output of the RPC ```decodescript``` did not change because it is 
 
 
 
-##RPC: SSL support dropped
+## RPC: SSL support dropped
 
 SSL support for RPC, previously enabled by the option ```rpcssl``` has been dropped from both the client and the server. This was done in preparation for removing the dependency on OpenSSL for the daemon completely.
 
@@ -352,26 +352,26 @@ SSLCertificateKeyFile /etc/apache2/ssl/server.key
 
 
 
-##Mining Code Changes
+## Mining Code Changes
 
 The mining code in 0.12 has been optimized to be significantly faster and use less memory. As part of these changes, consensus critical calculations are cached on a transaction’s acceptance into the mempool and the mining code now relies on the consistency of the mempool to assemble blocks. However all blocks are still tested for validity after assembly.
 
 
 
 
-##Other P2P Changes
+## Other P2P Changes
 
 The list of banned peers is now stored on disk rather than in memory. Restarting bitcoind will no longer clear out the list of banned peers; instead a new RPC call (```clearbanned```) can be used to manually clear the list. The new ```setban``` RPC call can also be used to manually ban or unban a peer.
 
 
 
 
-######Version 0.12.1
+###### Version 0.12.1
 
 
 
 
-##First version bits BIP9 softfork deployment
+## First version bits BIP9 softfork deployment
 
 This release includes a soft fork deployment to enforce BIP68, BIP112 and BIP113 using the BIP9 deployment mechanism.
 
@@ -384,7 +384,7 @@ This specific backport pull-request can be viewed at https://github.com/bitcoin/
 
 
 
-##BIP68 soft fork to enforce sequence locks for relative locktime
+## BIP68 soft fork to enforce sequence locks for relative locktime
 
 BIP68 introduces relative lock-time consensus-enforced semantics of the sequence number field to enable a signed transaction input to remain invalid for a defined period of time after confirmation of its corresponding outpoint.
 
@@ -393,7 +393,7 @@ For more information about the implementation, see https://github.com/bitcoin/bi
 
 
 
-##BIP112 soft fork to enforce OP_CHECKSEQUENCEVERIFY
+## BIP112 soft fork to enforce OP_CHECKSEQUENCEVERIFY
 
 BIP112 redefines the existing OP_NOP3 as OP_CHECKSEQUENCEVERIFY (CSV) for a new opcode in the Bitcoin scripting system that in combination with BIP68 allows execution pathways of a script to be restricted based on the age of the output being spent.
 
@@ -402,7 +402,7 @@ For more information about the implementation, see https://github.com/bitcoin/bi
 
 
 
-##BIP113 locktime enforcement soft fork
+## BIP113 locktime enforcement soft fork
 
 Bitcoin Core 0.11.2 previously introduced mempool-only locktime enforcement using GetMedianTimePast(). This release seeks to consensus enforce the rule.
 
@@ -419,13 +419,13 @@ Mempool inclusion rules currently require transactions to be valid for immediate
 
 
 
-####Implication for miners: 
+#### Implication for miners: 
 you will begin rejecting transactions that would not be valid under BIP113, which will prevent you from producing invalid blocks when BIP113 is enforced on the network. Any transactions which are valid under the current rules but not yet valid under the BIP113 rules will either be mined by other miners or delayed until they are valid under BIP113. Note, however, that time-based locktime transactions are more or less unseen on the network currently.
 
 
 
 
-####Implication for users: 
+#### Implication for users: 
 GetMedianTimePast() always trails behind the current time, so a transaction locktime set to the present time will be rejected by nodes running this release until the median time moves forward. To compensate, subtract one hour (3,600 seconds) from your locktimes to allow those transactions to be included in mempools at approximately the expected time.
 
 For more information about the implementation, see https://github.com/bitcoin/bitcoin/pull/6566
@@ -433,18 +433,18 @@ For more information about the implementation, see https://github.com/bitcoin/bi
 
 
 
-##Miscellaneous
+## Miscellaneous
 
 The p2p alert system is off by default. To turn on, use ```-alert``` with startup configuration.
 
 
 
 
-#####Version 0.13.0
+##### Version 0.13.0
 
 
 
-##Database cache memory increased
+## Database cache memory increased
 
 As a result of growth of the UTXO set, performance with the prior default database cache of 100 MiB has suffered. For this reason the default was changed to 300 MiB in this release.
 
@@ -454,11 +454,11 @@ For nodes on low-memory systems, the database cache can be changed back to 100 M
 
 * Changing it in the GUI under ```Options → Size of database cache```
 
-######Note that the database cache setting has the most performance impact during initial sync of a node, and when catching up after downtime.
+###### Note that the database cache setting has the most performance impact during initial sync of a node, and when catching up after downtime.
 
 
 
-##bitcoin-cli: arguments privacy
+## bitcoin-cli: arguments privacy
 
 The RPC command line client gained a new argument, ```-stdin``` to read extra arguments from standard input, one per line until EOF/Ctrl-D. For example:
 ```
@@ -474,7 +474,7 @@ It is recommended to use this for sensitive information such as wallet passphras
 
 
 
-##C++11 and Python 3
+## C++11 and Python 3
 
 Various code modernizations have been done. The Bitcoin Core code base has started using C++11. This means that a C++11-capable compiler is now needed for building. Effectively this means GCC 4.7 or higher, or Clang 3.3 or higher.
 
@@ -500,7 +500,7 @@ Note that Android is not considered ARM Linux in this context. The executables a
 
 
 
-##Compact Block support (BIP 152)
+## Compact Block support (BIP 152)
 
 Support for block relay using the Compact Blocks protocol has been implemented in PR 8068.
 
@@ -511,7 +511,7 @@ As a side-effect, ordinary non-mining nodes will download and upload blocks fast
 
 
 
-##Hierarchical Deterministic Key Generation
+## Hierarchical Deterministic Key Generation
 
 Newly created wallets will use hierarchical deterministic key generation according to BIP32 (keypath m/0’/0’/k’). Existing wallets will still use traditional key generation.
 
@@ -528,7 +528,7 @@ HD wallets are incompatible with older versions of Bitcoin Core.
 
 
 
-##Segregated Witness
+## Segregated Witness
 
 The code preparations for Segregated Witness (“segwit”), as described in BIP 141, BIP 143, BIP 144, and BIP 145 are finished and included in this release. However, BIP 141 does not yet specify activation parameters on mainnet, and so this release does not support segwit use on mainnet. Testnet use is supported, and after BIP 141 is updated with proposed parameters, a future release of Bitcoin Core is expected that implements those parameters for mainnet.
 
@@ -537,7 +537,7 @@ Furthermore, because segwit activation is not yet specified for mainnet, version
 
 
 
-##Mining transaction selection (“Child Pays For Parent”)
+## Mining transaction selection (“Child Pays For Parent”)
 
 The mining transaction selection algorithm has been replaced with an algorithm that selects transactions based on their feerate inclusive of unconfirmed ancestor transactions. This means that a low-fee transaction can become more likely to be selected if a high-fee transaction that spends its outputs is relayed.
 
@@ -554,7 +554,7 @@ In the future, the ```-blockmaxsize``` option may be removed, as block creation 
 
 
 
-##Reindexing changes
+## Reindexing changes
 
 In earlier versions, reindexing did validation while reading through the block files on disk. These two have now been split up, so that all blocks are known before validation starts. This was necessary to make certain optimizations that are available during normal synchronizations also available during reindexing.
 
@@ -572,14 +572,14 @@ For testing, the ```generate``` call can still be used to mine a block, and a ne
 
 
 
-##New bytespersigop implementation
+## New bytespersigop implementation
 
 The former implementation of the bytespersigop filter accidentally broke bare multisig (which is meant to be controlled by the ```permitbaremultisig``` option), since the consensus protocol always counts these older transaction forms as 20 sigops for backwards compatibility. Simply fixing this bug by counting more accurately would have reintroduced a vulnerability. It has therefore been replaced with a new implementation that rather than filter such transactions, instead treats them (for fee purposes only) as if they were in fact the size of a transaction actually using all 20 sigops.
 
 
 
 
-##Low-level P2P changes
+## Low-level P2P changes
 
 * The optional new p2p message “feefilter” is implemented and the protocol version is bumped to 70013. Upon receiving a feefilter message from a peer, a node will not send invs for any transactions which do not meet the filter feerate. BIP 133
 
@@ -598,7 +598,7 @@ The former implementation of the bytespersigop filter accidentally broke bare mu
 
 
 
-##Low-level RPC changes
+## Low-level RPC changes
 
 * RPC calls have been added to output detailed statistics for individual mempool entries, as well as to calculate the in-mempool ancestors or descendants of a transaction: see getmempoolentry, getmempoolancestors, getmempooldescendants.
 
@@ -631,7 +631,7 @@ The former implementation of the bytespersigop filter accidentally broke bare mu
 
 
 
-##Low-level ZMQ changes
+## Low-level ZMQ changes
 
 * Each ZMQ notification now contains an up-counting sequence number that allows listeners to detect lost notifications. The sequence number is always the last element in a multi-part ZMQ notification and therefore backward compatible. Each message type has its own counter. PR #7762.
 
