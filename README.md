@@ -1072,14 +1072,6 @@ The minimum version for the Clang compiler is still 3.3. Other minimum dependenc
 Pruned nodes can now signal BIP159's NODE_NETWORK_LIMITED using service bits, in preparation for
 full BIP159 support in later versions. This would allow pruned nodes to serve the most recent blocks. However, the current change does not yet include support for connecting to these pruned peers.
 
-
-## GUI changes
-
-- The option to reuse a previous address has now been removed. This was justified by the need to "resend" an invoice, but now that we have the request history, that need should be gone.
-- Support for searching by TXID has been added, rather than just address and label.
-- A "Use available balance" option has been added to the send coins dialog, to add the remaining available wallet balance to a transaction output.
-- A toggle for unblinding the password fields on the password dialog has been added.
-
 ## RPC changes
 
 
