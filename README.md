@@ -1,4 +1,4 @@
-# codebase Change Log
+# Codebase Change Log
 
 
 
@@ -440,12 +440,6 @@ There is no distinction between internal (change) and external keys.
 HD wallets are incompatible with older versions of VERGE.
 
 
-## Segregated Witness
-
-The code preparations for Segregated Witness (“segwit”), as described in BIP 141, BIP 143, BIP 144, and BIP 145 are finished and included in this release. However, BIP 141 does not yet specify activation parameters on mainnet, and so this release does not support segwit use on mainnet. Testnet use is supported, and after BIP 141 is updated with proposed parameters, a future release of VERGE is expected that implements those parameters for mainnet.
-
-Furthermore, because segwit activation is not yet specified for mainnet, version 0.13.0 will behave similarly as other pre-segwit releases even after a future activation of BIP 141 on the network. Upgrading from 0.13.0 will be required in order to utilize segwit-related features on mainnet (such as signal BIP 141 activation, mine segwit blocks, fully validate segwit blocks, relay segwit blocks to other segwit nodes, and use segwit transactions in the wallet, etc).
-
 
 ## Mining transaction selection (“Child Pays For Parent”)
 
@@ -728,17 +722,6 @@ Since the changes in 0.12 to automatically limit the size of the mempool and imp
 
 The `-minrelaytxfee` option continues to exist but is recommended to be left unset.
 
-## Fee Estimation Changes
-
-
-- Since 0.13.2 fee estimation for a confirmation target of 1 block has been
-  disabled. The fee slider will no longer be able to choose a target of 1 block.
-  This is only a minor behavior change as there was often insufficient
-  data for this target anyway. `estimatefee 1` will now always return -1 and
-  `estimatesmartfee 1` will start searching at a target of 2.
-
-- The default target for fee estimation is changed to 6 blocks in both the GUI
-  (previously 25) and for RPC calls (previously 2).
 
 ## Removal of Priority Estimation
 
